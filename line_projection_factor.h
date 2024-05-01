@@ -16,9 +16,9 @@ using namespace Eigen;
 // 7:  j帧imu pose(P_wb,j R_wbj)
 // 7:  外参
 // 2： i帧直线在World坐标系中2个深度参数
-class LineProjectionFactor : public ceres::SizedCostFunction<2, 7, 7,7> {
+class LineProjectionFactor : public ceres::SizedCostFunction<2, 7, 7,7,5> {
 public:
-    LineProjectionFactor(const Vector3d &_line_i_s, const Vector3d &_line_i_e,const Vector3d &_line_j_s,const Vector3d &_line_j_e,double *_orth);
+    LineProjectionFactor(const Vector3d &_line_i_s, const Vector3d &_line_i_e,const Vector3d &_line_j_s,const Vector3d &_line_j_e);
 
     virtual bool Evaluate(double const *const *parameters, double *residuals, double **jacobians) const;
 
@@ -27,7 +27,6 @@ public:
 
 
     Vector3d line_i_s,line_i_e,line_j_s,line_j_e;
-    double *orth;
 
     static Eigen::Matrix2d sqrt_info;
 

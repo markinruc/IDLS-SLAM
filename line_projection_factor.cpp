@@ -1,9 +1,9 @@
 #include "line_projection_factor.h"
 //information matrix
-Eigen::Matrix2d LineProjectionFactor::sqrt_info=460/ 1.5 * Matrix2d::Identity();
+Eigen::Matrix2d LineProjectionFactor::sqrt_info=Matrix2d::Identity();
 
-LineProjectionFactor::LineProjectionFactor(const Vector3d &_line_i_s, const Vector3d &_line_i_e,const Vector3d &_line_j_s,const Vector3d &_line_j_e,double *_orth)
-        : line_i_s(_line_i_s),line_i_e(_line_i_e),line_j_s(_line_j_s),line_j_e(_line_j_e),orth(_orth)
+LineProjectionFactor::LineProjectionFactor(const Vector3d &_line_i_s, const Vector3d &_line_i_e,const Vector3d &_line_j_s,const Vector3d &_line_j_e)
+        : line_i_s(_line_i_s),line_i_e(_line_i_e),line_j_s(_line_j_s),line_j_e(_line_j_e)
 {
 };
 
@@ -18,14 +18,17 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
     Eigen::Matrix3d Ri = Qi.toRotationMatrix();
     Eigen::Matrix3d Rj = Qj.toRotationMatrix();
     Eigen::Matrix3d ric = qic.toRotationMatrix();
-	vector<double> line;
-         for(int l=0;l<5;l++)
-        {
-              line.push_back(orth[l]);
-         }
-        //i时刻相机坐标系下的map line普吕克坐标
+	double orth[5];
+    for (int i = 0; i < 5; ++i)
+    {
+        orth[i] = parameters[3][i];
+    }
+    Eigen::Quaterniond qW(parameters[3][3], parameters[3][0], parameters[3][1], parameters[3][2]);
+    double phi = parameters[3][4];
+
+    //i时刻相机坐标系下的map line普吕克坐标
 	Eigen::Vector3d Lci_n, Lci_d;
-	Utility::cvtOrthonormalToPlucker(line, Lci_n, Lci_d);
+	Utility::cvtOrthonormalToPlucker(orth, Lci_n, Lci_d);
         //cout<<"n"<<Lci_n<<"d"<<Lci_d<<endl;
 	//i时刻IMU坐标系下的map line普吕克坐标
 	Eigen::Vector3d Lbi_n, Lbi_d;
@@ -81,7 +84,7 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
             Eigen::Map<Eigen::Matrix<double, 2, 7, Eigen::RowMajor>> jacobian_pose_i(jacobians[0]);
 
             Eigen::Matrix<double, 6, 6> jaco_i;
-	    jaco_i.setZero();
+	        jaco_i.setZero();
             jaco_i.block<3,3>(0,0) = -ric.transpose() * Rj.transpose()*Utility::skewSymmetric(Lw_d);
             jaco_i.block<3,3>(0,3) = -ric.transpose() * Rj.transpose()*Ri*Utility::skewSymmetric(Lbi_n)-ric.transpose() * Rj.transpose()*Utility::skewSymmetric(Pi)*Ri*Utility::skewSymmetric(Lbi_d)+ric.transpose() * Rj.transpose()*Utility::skewSymmetric(Pj)*Ri*Utility::skewSymmetric(Lbi_d)+ric.transpose() * Utility::skewSymmetric(tic)*Rj.transpose()*Ri*Utility::skewSymmetric(Lbi_d);
 			jaco_i.block<3,3>(3,3) = -ric.transpose() * Rj.transpose()*Ri*Utility::skewSymmetric(Lbi_d);
@@ -118,7 +121,41 @@ bool LineProjectionFactor::Evaluate(double const *const *parameters, double *res
 
             jacobian_ex_pose.leftCols<6>() = reduce * jaco_ex;
             jacobian_ex_pose.rightCols<1>().setZero();
-        }		
+        }
+        if (jacobians[3])
+        {
+            //准备工作
+            double w1 = std::cos(phi);
+            double w2 = std::sin(phi);
+            Eigen::Vector3d U1 = Lci_n.normalized();
+            Eigen::Vector3d U2 = Lci_d.normalized();
+            Eigen::Vector3d U3 = Lci_n.cross(Lci_d).normalized();
+
+
+            Eigen::Map<Eigen::Matrix<double, 2, 5, Eigen::RowMajor>> jacobian_line(jacobians[3]);
+            Eigen::Matrix<double, 6, 6> invTbc;
+            invTbc << ric.transpose(), -ric.transpose()*Utility::skewSymmetric(tic),
+                    Eigen::Matrix3d::Zero(),  ric.transpose();
+            Eigen::Matrix<double, 6, 6> invTwbj;
+            invTwbj << Rj.transpose(), -Rj.transpose()*Utility::skewSymmetric(Pj),
+                    Eigen::Matrix3d::Zero(),  Rj.transpose();
+            Eigen::Matrix<double, 6, 6> Twbi;
+		    Twbi << Ri, Utility::skewSymmetric(Pj)*Ri,
+                    Eigen::Matrix3d::Zero(),  Ri;
+            Eigen::Matrix<double, 6, 6> Tbc;
+	        Tbc << ric, Utility::skewSymmetric(tic)*ric.transpose(),
+                    Eigen::Matrix3d::Zero(),  ric;
+            Eigen::Matrix<double, 6, 5> jaco_l;
+            jaco_l.setZero();
+            jaco_l.block<3, 1>(3, 0) = w2*U3;
+            jaco_l.block<3, 1>(0, 1) = -w1*U3;
+            jaco_l.block<3, 1>(0, 2) = w1*U2;
+            jaco_l.block<3, 1>(3, 2) = -w2*U1;
+            jaco_l.block<3, 1>(0, 4) = -w2*U1;
+            jaco_l.block<3, 1>(3, 4) = w1*U2;
+            //std::cout<<"jaco_l"<<std::endl<<jaco_l<<std::endl;
+            jacobian_line = reduce*invTbc*invTwbj*Twbi*Tbc*jaco_l;
+        }				
 	}
 	return true;
 };

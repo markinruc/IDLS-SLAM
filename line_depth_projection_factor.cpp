@@ -1,6 +1,6 @@
 #include "line_depth_projection_factor.h"
 //information matrix
-Eigen::Matrix2d LineProjectionFactor::sqrt_info=460/ 1.5 * Matrix2d::Identity();
+Eigen::Matrix2d LineProjectionFactor::sqrt_info= Matrix2d::Identity();
 
 LineProjectionFactor::LineProjectionFactor(const Vector3d &_line_i_s, const Vector3d &_line_i_e,const Vector3d &_line_j_s,const Vector3d &_line_j_e)
         : line_i_s(_line_i_s),line_i_e(_line_i_e),line_j_s(_line_j_s),line_j_e(_line_j_e)
