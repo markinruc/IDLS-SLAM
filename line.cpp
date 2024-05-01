@@ -151,6 +151,10 @@ int main(int argc, char** argv) {
                //line_triangulate(line_i_s,line_i_e,line_j_s,line_j_e,t0,t1,q0.toRotationMatrix(),q1.toRotationMatrix(),imu_i);
                LineDepthProjectionFactor *l = new LineDepthProjectionFactor(line_i_s,line_i_e,line_j_s,line_j_e);//这里面会计算残差以及残差对优化变量雅克比矩阵
                problem.AddResidualBlock(l, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_line_depth[line_feature_index]);//这里指定了相关的优化变量
+               /*
+               LineProjectionFactor *l = new LineProjectionFactor(line_i_s,line_i_e,line_j_s,line_j_e);//这里面会计算残差以及残差对优化变量雅克比矩阵
+               problem.AddResidualBlock(l, loss_function, para_Pose[imu_i], para_Pose[imu_j], para_Ex_Pose[0], para_line[line_feature_index]);//这里指定了相关的优化变量              
+               */
                line_m_cnt++;					           
             }
 		}
@@ -190,8 +194,7 @@ int main(int argc, char** argv) {
          cout<<"inv1:"<<para_line_depth[i][0]<<endl;
          cout<<"inv2:"<<para_line_depth[i][1]<<endl;
 
-    }
-        
+    }   
      
 
      

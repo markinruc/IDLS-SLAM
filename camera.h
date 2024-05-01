@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <bits/stdc++.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 #include <ceres/ceres.h>
 #include <Eigen/Dense>
 #include <cstdlib> 
