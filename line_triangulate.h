@@ -3,8 +3,6 @@
 
 #include <iostream>
 #include <bits/stdc++.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 #include <ceres/ceres.h>
 #include <Eigen/Dense>
 #include <cstdlib> 
@@ -111,13 +109,18 @@ class LinedepthCostFunction : public ceres::SizedCostFunction<1,1>
 
 class LineTriangulate{
     public:
-    LineTriangulate(camera _cam1,double *_para_line,double *_para_Pose):cam1(_cam1),para_line(_para_line),para_Pose(_para_Pose){
+    LineTriangulate(camera _cam1,double (*_para_depth_line)[2],double (*_para_Pose)[7]):cam1(_cam1),para_depth_line(_para_depth_line),para_Pose(_para_Pose){
+        line_para_depth=true;
+        
+    }
+    LineTriangulate(camera _cam1,double (*_para_line)[5],double (*_para_Pose)[7]):cam1(_cam1),para_line(_para_line),para_Pose(_para_Pose){
         line_para_depth=false;
         
     }
     camera cam1;
-    double *para_line;
-    double *para_Pose;
+    double (*para_line)[5];
+    double (*para_depth_line)[2];
+    double (*para_Pose)[7];
     bool line_para_depth;
     void leastsquare_depth();  
     void avg_plucker();

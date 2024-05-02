@@ -19,7 +19,7 @@ void LineTriangulate::avg_plucker()
     int imu_i=0;	
     for (int i=0;i<LINE_NUM;i++)//遍历滑窗内所有的空间线
     {
-        Eigen::Vector3d line_i_s,Eigen::Vector3d line_i_e;
+        Eigen::Vector3d line_i_s;Eigen::Vector3d line_i_e;
         line_i_s<<cam1.camera_observation[i][imu_i].point1.x,cam1.camera_observation[i][imu_i].point1.y,cam1.camera_observation[i][imu_i].point1.z;
 	    line_i_e<<cam1.camera_observation[i][imu_i].point2.x,cam1.camera_observation[i][imu_i].point2.y,cam1.camera_observation[i][imu_i].point2.z;
         Eigen::Vector3d t0(para_Pose[imu_i][0], para_Pose[imu_i][1], para_Pose[imu_i][2]);
@@ -77,13 +77,13 @@ void LineTriangulate::avg_plucker()
                     {
                         if(z1>0)
                         {
-                            para_line[i][0]=1/z1;
-                            para_line[i][1]=1/z2;
+                            para_depth_line[i][0]=1/z1;
+                            para_depth_line[i][1]=1/z2;
                         }
                         else
                         {
-                           para_line[i][0]=-1/z1;
-                           para_line[i][1]=-1/z2;
+                           para_depth_line[i][0]=-1/z1;
+                           para_depth_line[i][1]=-1/z2;
                         }
                     }
 
@@ -91,7 +91,7 @@ void LineTriangulate::avg_plucker()
                 else
                 {
                     double d=pu_n.norm()/pu_v.norm();
-                    pu.n=pu_n.normalized();
+                    pu_n=pu_n.normalized();
                     pu_v=pu_v.normalized();
                     v_ei.push_back(pu_v);
                     n_ei.push_back(pu_n);
@@ -143,8 +143,7 @@ void LineTriangulate::avg_plucker()
 void LineTriangulate::leastsquare_depth()
 {	
    
-   int imu_i=0;	
-   line_para_depth=true;	
+   int imu_i=0;		
    avg_plucker();
    for (int i=0;i<LINE_NUM;i++)//遍历滑窗内所有的空间线
     {
@@ -153,8 +152,8 @@ void LineTriangulate::leastsquare_depth()
 		double line_depth[2]={1,1};
         Vector3d line_i_s,line_i_e;
 
-		line_depth[0]=1/para_line[i][0];
-        line_depth[1]=1/para_line[i][1];		        
+		line_depth[0]=1/para_depth_line[i][0];
+        line_depth[1]=1/para_depth_line[i][1];		        
 	    line_i_s<<cam1.camera_observation[i][imu_i].point1.x,cam1.camera_observation[i][imu_i].point1.y,cam1.camera_observation[i][imu_i].point1.z;
 	    line_i_e<<cam1.camera_observation[i][imu_i].point2.x,cam1.camera_observation[i][imu_i].point2.y,cam1.camera_observation[i][imu_i].point2.z;
         Eigen::Vector3d t0(para_Pose[imu_i][0], para_Pose[imu_i][1], para_Pose[imu_i][2]);
@@ -206,8 +205,8 @@ void LineTriangulate::leastsquare_depth()
         //放入初始化矩阵
 		if (line_depth[0]>1&&line_depth[1]>1)
 		{
-		    para_line[i][0]=1/line_depth[0];
-		    para_line[i][1]=1/line_depth[1];
+		    para_depth_line[i][0]=1/line_depth[0];
+		    para_depth_line[i][1]=1/line_depth[1];
 		}
         
         
@@ -229,6 +228,7 @@ void LineTriangulate::leastsquare_plucker(){
         double line_direction[3]={1,1,1};
         double line_depth[1]={1};
         double orth[5];
+        Vector3d n,v;
         for(int k=0;k<5;k++)
         {
             orth[k]=para_line[i][k];

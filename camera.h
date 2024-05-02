@@ -39,8 +39,8 @@ class camera
     vector<vector<int>> windows;
     vector<vector<line>> camera_observation;
     vector<Eigen::Isometry3d> T;
-    double *para_Pose;
-    camera(double *_para_Pose):para_Pose(_para_Pose)
+    double (*para_Pose)[7];
+    camera(double (*_para_Pose)[7]):para_Pose(_para_Pose)
     {
         lines.clear();
         T.clear();

@@ -1,11 +1,11 @@
 /***
 line.cpp author:Wanting Li
 camera--Observation models for cameras, simulated observations
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 ***/
 #include <iostream>
 #include<bits/stdc++.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 #include <ceres/ceres.h>
 #include <Eigen/Dense>
 #include <cstdlib> 
@@ -61,7 +61,6 @@ int main(int argc, char** argv) {
 	unsigned seed; 
 	seed = time(0);
     srand(seed);
-	
 	
     //构建线观测
 	camera cam1(para_Pose);
