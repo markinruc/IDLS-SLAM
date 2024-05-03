@@ -33,7 +33,7 @@ void DataLoader::writeLine(const std::string& filename,const double& x,const dou
 
 };
 
-void DataLoader::writeTriangulate(string filename,double (*para_depth_line)[2],camera _cam1,double *para_pose){
+void DataLoader::writeTriangulate(string filename,double (*para_depth_line)[2],camera cam1,double *para_pose){
         Eigen::Vector3d t0(para_pose[0], para_pose[1], para_pose[2]);
         Eigen::Quaterniond q0(para_pose[6], para_pose[3], para_pose[4], para_pose[5]);
         Eigen::Matrix3d R0=q0.toRotationMatrix();

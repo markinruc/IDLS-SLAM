@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
 	//初始化
 	LineTriangulate line_triangulate(cam1,para_line_depth,para_Pose);
 	line_triangulate.leastsquare_depth();
-    dataload.writeTriangulate("line_depth_"+triangulate_filename,para_line_depth,para_Pose[0]);
+    dataload.writeTriangulate("line_depth_"+triangulate_filename,para_line_depth,cam1,para_Pose[0]);
 
     /*
     LineTriangulate line_triangulate(cam1,para_line,para_Pose);
