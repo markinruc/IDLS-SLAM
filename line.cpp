@@ -63,11 +63,12 @@ int main(int argc, char** argv) {
 	unsigned seed; 
 	seed = time(0);
     srand(seed);
-	DataLoader dataload;
     line_filename="line-world.txt";
     transform_filename="transformer.txt";
+    triangulate_filename="triangulate.txt";
     //构建线观测
 	camera cam1(para_Pose);
+    DataLoader dataload;
 	for (int i=0;i < WINDOW_SIZE + 1; i++)
 	{
 	    //Eigen::AngleAxisd V(3.1415926 / (rand() % 10 + 1), Eigen::Vector3d(rand() % 10, rand() % 10, rand() % 10).normalized());
@@ -88,7 +89,11 @@ int main(int argc, char** argv) {
         double z1=rand() % 5+30;
 	    if(cam1.add_line(x,y,z,x1,y1,z1))
         {
-
+            dataloader.writeLine(x,y,z,x1,y1,z1);
+        }
+        else
+        {
+            i=i-1;
         }
 	}
         for (int i=0;i<LINE_NUM;i++)
@@ -105,6 +110,7 @@ int main(int argc, char** argv) {
 	//初始化
 	LineTriangulate line_triangulate(cam1,para_line_depth,para_Pose);
 	line_triangulate.leastsquare_depth();
+    dataload.writeTriangulate("line_depth_"+triangulate_filename,para_line_depth,para_Pose[0]);
 
     /*
     LineTriangulate line_triangulate(cam1,para_line,para_Pose);

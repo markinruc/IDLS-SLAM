@@ -17,7 +17,7 @@ class DataLoader{
     DataLoader();
     void wirteTransformer(const std::string& filename, const Eigen::AngleAxisd& angleAxis, const Eigen::Vector3d& translation);
     void writeLine(const std::string& filename,const double& x,const double& y,const double& z,const double& x1,const double& y1,const double& z1);
-    void writeTriangulate(const std::string& filename);
+    void writeTriangulate(string filename,double (*para_depth_line)[2],camera _cam1,double *para_pose);
 
 };
 
