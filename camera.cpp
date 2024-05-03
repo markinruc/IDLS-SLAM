@@ -1,13 +1,13 @@
 #include "camera.h"
 
 
- void camera::add_line(double x,double y,double z,double x1,double y1,double z1)
+bool camera::add_line(double x,double y,double z,double x1,double y1,double z1)
     {
         line new_line;
         if(x==x1&&y==y1&&z==z1)
         {
             cout<<"input point is equal"<<endl;
-            return; 
+            return false; 
         }
         new_line.point1.x=x;
         new_line.point1.y=y;
@@ -16,6 +16,7 @@
         new_line.point2.y=y1;
         new_line.point2.z=z1;
         lines.push_back(new_line);
+        return true;
     }
     void camera::new_pose(Eigen::AngleAxisd V,Eigen::Vector3d translation)
     {

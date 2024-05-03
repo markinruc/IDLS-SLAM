@@ -57,7 +57,7 @@ class camera
         windows.resize(LINE_NUM,a);
         camera_observation.resize(LINE_NUM,smallline);
     }
-    void add_line(double x,double y,double z,double x1,double y1,double z1);
+    bool add_line(double x,double y,double z,double x1,double y1,double z1);
     void new_pose(Eigen::AngleAxisd V,Eigen::Vector3d translation);
     void set_observation(int i,int j);
    

@@ -16,6 +16,7 @@ include_directories(${CERES_INCLUDE_DIRS})
 set(SRC_LIST
 	 ./line.cpp
 	 ./camera.cpp
+	 ./dataloader.cpp
 	 ./line_triangulate.cpp
 	 ./line_projection_factor.cpp
 	 ./line_depth_projection_factor.cpp

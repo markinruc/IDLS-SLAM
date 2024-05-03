@@ -10,6 +10,7 @@ camera--Observation models for cameras, simulated observations
 #include <Eigen/Dense>
 #include <cstdlib> 
 #include <ctime>
+#include <string>
 
 #include "pose_local_parameterization.h"
 #include "line_projection_factor.h"
@@ -18,6 +19,7 @@ camera--Observation models for cameras, simulated observations
 #include "line_triangulate.h"
 #include "camera.h"
 #include "global.h"
+#include "dataloader.h"
 
 using namespace std;
 using namespace ceres;
@@ -61,7 +63,9 @@ int main(int argc, char** argv) {
 	unsigned seed; 
 	seed = time(0);
     srand(seed);
-	
+	DataLoader dataload;
+    line_filename="line-world.txt";
+    transform_filename="transformer.txt";
     //构建线观测
 	camera cam1(para_Pose);
 	for (int i=0;i < WINDOW_SIZE + 1; i++)
@@ -70,11 +74,22 @@ int main(int argc, char** argv) {
         Eigen::AngleAxisd V(0, Eigen::Vector3d(0,0,0).normalized());
         Eigen::Vector3d translation(rand() % 20-10, rand() % 20-10, rand() % 2);
 	    cam1.new_pose(V,translation);
+        dataloader.wirteTransformer(transform_filename,V,translation);
+
 	}
     
 	for (int i=0;i<LINE_NUM;i++)
 	{
-	    cam1.add_line(rand() % 5+30,rand() % 5+30,rand() % 5+30,rand() % 5+30,rand() % 5+30,rand() % 5+30);
+        double x=rand() % 5+30;
+        double y=rand() % 5+30;
+        double z=rand() % 5+30;
+        double x1=rand() % 5+30;
+        double y1=rand() % 5+30;
+        double z1=rand() % 5+30;
+	    if(cam1.add_line(x,y,z,x1,y1,z1))
+        {
+
+        }
 	}
         for (int i=0;i<LINE_NUM;i++)
 	{
