@@ -61,3 +61,31 @@ void DataLoader::writeTriangulate(string filename,double (*para_depth_line)[2],c
        outFile.close();
 
 };
+
+void DataLoader::writeTriangulate(string filename,double (*para_line)[5],camera cam1,double *para_pose){
+        Eigen::Vector3d t0(para_pose[0], para_pose[1], para_pose[2]);
+        Eigen::Quaterniond q0(para_pose[6], para_pose[3], para_pose[4], para_pose[5]);
+        Eigen::Matrix3d R0=q0.toRotationMatrix();
+        ofstream outFile(filename);
+        if (!outFile.is_open()) {
+            std::cerr << "Unable to open file for writing!" << std::endl;
+            return;
+        }
+        for (int i=0;i<LINE_NUM;i++)//遍历滑窗内所有的空间线
+       {
+     		    
+		    double orth[5];
+            for (int j = 0; j < 5; ++j)
+            {
+                orth[j] = para_line[i][j];
+            }
+            Eigen::Vector3d Lci_n, Lci_d;
+	        Utility::cvtOrthonormalToPlucker(orth, Lci_n, Lci_d);
+            Eigen::Vector3d Lw_n, Lw_d;
+	        Lw_n=R0*Lci_n+Utility::skewSymmetric(t0)*R0*Lci_d;
+	L       Lw_d=R0*Lci_d;
+            outFile << Lw_n.transpose()  << Lw_d.transpose() << endl;
+       }
+       outFile.close();
+
+};
