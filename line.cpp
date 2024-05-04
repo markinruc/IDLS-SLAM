@@ -116,6 +116,7 @@ int main(int argc, char** argv) {
     LineTriangulate line_triangulate(cam1,para_line,para_Pose);
     line_triangulate.avg_plucker();
     line_triangulate.leastsquare_plucker();
+    dataload.writeTriangulate("line_"+triangulate_filename,para_line,cam1,para_Pose[0]);
     */
 	
     //构建寻优问题

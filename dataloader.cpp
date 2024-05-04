@@ -4,6 +4,17 @@ DataLoader::DataLoader(){
 
 };
 
+double caldepth(Vector3d n,Vector3d d,Vector3d p)
+{
+    Vector3d b=p.cross(d);
+    Matrix<double, 3, 1> A;
+    A << b;
+    double x;
+    x = A.bdcSvd(ComputeThinU | ComputeThinV).solve(n);
+    return x;
+};
+
+
 void DataLoader::writeTransformer(const std::string& filename, const Eigen::AngleAxisd& angleAxis, const Eigen::Vector3d& translation){
     std::ofstream outfile(filename, std::ios::app); // 以追加模式打开文件
     if (!outfile.is_open()) {
@@ -56,7 +67,7 @@ void DataLoader::writeTriangulate(string filename,double (*para_depth_line)[2],c
             Vector3d line_s,line_e;
             line_s=R0*line_i_s+t0;
             line_e=R0*line_i_e+t0;
-            outFile << line_s.transpose()  << line_e.transpose() << endl;
+            outFile << line_s.transpose() <<" "<< line_e.transpose() << endl;
        }
        outFile.close();
 
@@ -80,11 +91,18 @@ void DataLoader::writeTriangulate(string filename,double (*para_line)[5],camera 
                 orth[j] = para_line[i][j];
             }
             Eigen::Vector3d Lci_n, Lci_d;
+            Vector3d line_i_s,line_i_e;
 	        Utility::cvtOrthonormalToPlucker(orth, Lci_n, Lci_d);
-            Eigen::Vector3d Lw_n, Lw_d;
-	        Lw_n=R0*Lci_n+Utility::skewSymmetric(t0)*R0*Lci_d;
-	L       Lw_d=R0*Lci_d;
-            outFile << Lw_n.transpose()  << Lw_d.transpose() << endl;
+            line_i_s<<cam1.camera_observation[i][0].point1.x,cam1.camera_observation[i][0].point1.y,cam1.camera_observation[i][0].point1.z;
+	        line_i_e<<cam1.camera_observation[i][0].point2.x,cam1.camera_observation[i][0].point2.y,cam1.camera_observation[i][0].point2.z;
+            double ds=caldepth(Lci_n, Lci_d,line_i_s);
+            double de=caldepth(Lci_n, Lci_d,line_i_e);
+            line_i_s=line_i_s*ds;
+            line_i_e=line_i_e*de;
+            Vector3d line_s,line_e;
+            line_s=R0*line_i_s+t0;
+            line_e=R0*line_i_e+t0;
+            outFile << line_s.transpose() <<" "<< line_e.transpose() << endl;
        }
        outFile.close();
 
