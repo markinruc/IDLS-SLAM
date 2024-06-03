@@ -1,4 +1,10 @@
 # line-simulation
+
+## 实验结果
+
+![image](https://github.com/markinruc/lines-sim/assets/114041341/4822ad13-2cf4-473f-84c9-ae2d2714fed7)
+
+
 ## 功能
 
 生成随机的相机运动和线特征，估计结果
